@@ -14,8 +14,9 @@ import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int MY_REQUEST_CODE = 1;
+    static final int CUSTOM_CAMERA_CODE = 3;
+    static final int REQUEST_IMAGE_CAPTURE = 2;
+    static final int BUILT_IN_CAMERA_CODE = 1;
     private Button btnBuiltInCamera;
     private Button btnCustomCamera;
     private ImageView imgPhoto;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED) {
 
                 requestPermissions(new String[]{Manifest.permission.CAMERA},
-                        MY_REQUEST_CODE);
+                        BUILT_IN_CAMERA_CODE);
             }
             else{
 
@@ -51,11 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_REQUEST_CODE: {
+            case BUILT_IN_CAMERA_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -71,6 +73,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return;
             }
+            case CUSTOM_CAMERA_CODE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent myIntent = new Intent(MainActivity.this, CameraActivity.class);
+                    MainActivity.this.startActivity(myIntent);
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+
+            }
 
             // other 'case' lines to check for other
             // permissions this app might request
@@ -79,11 +98,20 @@ public class MainActivity extends AppCompatActivity {
 
     private View.OnClickListener btnCustomCameraAction = new  View.OnClickListener(){
         @Override
+        @TargetApi(23)
         public void onClick(View v) {
 
+            if (checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(new String[]{Manifest.permission.CAMERA},
+                        CUSTOM_CAMERA_CODE);
+            }
+            else{
+                Intent myIntent = new Intent(MainActivity.this, CameraActivity.class);
+                MainActivity.this.startActivity(myIntent);
+            }
         }
-
-
     };
 
     private void dispatchTakePictureIntent() {
